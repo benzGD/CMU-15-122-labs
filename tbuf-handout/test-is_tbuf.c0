@@ -1,0 +1,17 @@
+/**************************************************************************/
+/*              COPYRIGHT Carnegie Mellon University 2023                 */
+/* Do not post this file or any derivative on a public site or repository */
+/**************************************************************************/
+#use <conio>
+
+int main() {
+  // Create a few text buffers, some correct others incorrect
+
+
+  // Using them, test your is_tbuf
+
+
+
+  printf("All tests passed!\n");
+  return 0;
+}

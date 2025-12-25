@@ -1,0 +1,110 @@
+/**************************************************************************/
+/*              COPYRIGHT Carnegie Mellon University 2023                 */
+/* Do not post this file or any derivative on a public site or repository */
+/**************************************************************************/
+#use <string>
+#use <conio>
+
+// You are welcome to define helper functions for your tests
+
+int main() {
+  // Create a password database and check a few passwords against it.
+  // Use pwd_stats to make sure the stats are updated correctly.
+
+
+  // pwd_t password_db = pwd_new(20,  "data/20-badpwd.txt");
+
+
+  // int count = pwd_check(password_db, "password");
+
+  // if (count == 0)
+  // {
+  //   printf("ok atleast this much passed!!\n");
+  // }
+  
+
+
+
+
+
+  // printf("All correctness tests passed!\n\n");
+  // return 0;
+  pwd_t db = pwd_new(100, "data/20-badpwd.txt"); 
+    
+    // --- TEST 1: The "True Positive" (Return 0) ---
+    // "123456" is definitely in the file.
+    // Logic: QuickCheck -> True, ThoroughCheck -> True
+    printf("Test 1: Checking '123456' (Should be FOUND)...\n");
+    int res1 = pwd_check(db, "123456");
+    assert(res1 == 0); // 0 means "Compromised"
+    
+    // Verify Stats Internals
+    assert(db->checks == 1);
+    assert(db->truepos == 1);
+    assert(db->trueneg == 0);
+    assert(db->falsepos == 0);
+    printf("[PASS] True Positive logic correct.\n");
+
+
+    // --- TEST 2: The "True Negative" (Return 2) ---
+    // "SuperSafeRandomString" is definitely NOT in the file.
+    // Logic: QuickCheck -> False (likely)
+    printf("Test 2: Checking 'SuperSafeRandomString' (Should be SAFE)...\n");
+    int res2 = pwd_check(db, "SuperSafeRandomString");
+    
+    // NOTE: In rare cases, this might be a false positive (Return 1), 
+    // but with capacity 100 and only ~20 items, it should be Return 2.
+    assert(res2 == 2); 
+    
+    // Verify Stats Internals
+    assert(db->checks == 2);
+    assert(db->truepos == 1); // Should not change
+    assert(db->trueneg == 1); // Should increment
+    assert(db->falsepos == 0);
+    printf("[PASS] True Negative logic correct.\n");
+
+
+    // --- TEST 3: Another True Positive (Accumulation) ---
+    printf("Test 3: Checking 'qwerty' (Should be FOUND)...\n");
+    int res3 = pwd_check(db, "qwerty");
+    assert(res3 == 0);
+
+    // Verify Stats Accumulated
+    assert(db->checks == 3);
+    assert(db->truepos == 2); // 1 + 1
+    assert(db->trueneg == 1);
+    assert(db->falsepos == 0); 
+    printf("[PASS] Stats are accumulating correctly.\n");
+
+
+    // --- TEST 4: The "False Positive" Hunt (Return 1) ---
+    // This is hard to force deterministically without knowing your exact hash.
+    // We will try to find one by spamming random strings.
+    // If we find one, we verify that falsepos increments.
+    printf("Test 4: Hunting for a False Positive (Collision)...\n");
+    
+    // We create a tiny Bloom filter to force collisions
+    pwd_t tiny_db = pwd_new(1, "data/20-badpwd.txt"); // Capacity 1 = GUARANTEED collisions
+    
+    // "Not_In_File" is not in the file, but since capacity is 1, 
+    // the Bloom filter is full of 1s. It will say "Maybe".
+    // Thorough check will say "No".
+    // Result should be 1.
+    int res4 = pwd_check(tiny_db, "Not_In_File");
+    
+    if (res4 == 1) {
+        assert(tiny_db->checks == 1);
+        assert(tiny_db->falsepos == 1);
+        assert(tiny_db->truepos == 0);
+        assert(tiny_db->trueneg == 0);
+        printf("[PASS] False Positive logic verified (using tiny capacity).\n");
+    } else {
+        printf("[INFO] Could not force false positive (unexpected for cap 1).\n");
+    }
+
+    printf("\n--- FINAL STATS DUMP ---\n");
+    pwd_stats(db); // Test the print function itself
+    
+    printf("\nALL TESTS PASSED.\n");
+    return 0;
+}

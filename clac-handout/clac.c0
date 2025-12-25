@@ -1,0 +1,435 @@
+/**************************************************************************/
+/*              COPYRIGHT Carnegie Mellon University 2023                 */
+/* Do not post this file or any derivative on a public site or repository */
+/**************************************************************************/
+/*
+ * Clac, stack-based calculator language
+ *
+ * 15-122 Principles of Imperative Computation
+ */
+
+#use <string>
+#use <parse>
+#use <conio>
+#use <args>
+#use <util>
+
+/* From the perspective of the clac-main.c0 file, state_t is an
+ * abstract type. (typedef ____* state_t) This file contains the
+ * implementation of the state_t type. You will need to modify
+ * this type when you do task 3. */
+struct sym_table
+{
+  dict_t dictionary;
+  qstack_t return_stack;
+
+};
+
+typedef struct sym_table sym;
+typedef struct sym_table* state_t;  // MODIFY ME
+state_t init_state()
+//@ensures \result != NULL;
+{
+  // UPDATE ME
+  state_t A = alloc(sym);
+  A->dictionary = dict_new();
+  A-> return_stack = qstack_new();
+
+  return A;  // MODIFY ME
+}
+
+
+bool check_func(stack_t S)
+{
+  int x = 0;
+  int y = 0;
+  if (stack_empty(S))
+  {
+    error("stack is empty!");
+  } else
+  {
+    x = pop(S);
+  }
+  if (stack_empty(S))
+  {
+    error("stack is empty!");
+  } else
+  {
+    y = pop(S);
+  }
+  push(S, y);
+  push(S, x);
+  return true;
+}
+
+
+int exponent(int x, int y){
+  if (y ==0)
+  {
+    return 1;
+  }
+
+
+  return x * exponent(x, y -1);  
+
+}
+
+/* Main clac interpreter. */
+/* Return true: clac top-level interpreter will expect more input */
+/* Return false: clac top-level interpreter will exit */
+bool eval(queue_t inputQ, stack_t S, state_t ST)
+//@requires inputQ != NULL && S != NULL && ST != NULL;
+//@ensures \result == false || queue_empty(inputQ);
+{
+  queue_t Q = inputQ;
+
+  while (!queue_empty(Q)) {
+    string tok = deq(Q); /* Is this dequeue safe? */
+    // Uncommenting these lines might help with debugging:
+    // printf("Read: %s\n", tok);
+    if (string_equal(tok, "print")) {
+      if (stack_empty(S)){
+        error("print called when stack is empty!");
+      } else {
+        int x = pop(S);
+
+        printf("%d\n", x);
+      }
+    } else if (string_equal(tok, "quit")) {
+      return false;
+    } else if (string_equal(tok, "+"))    {
+      int value1;
+      int value2;
+      bool b = check_func(S);
+      if (b)
+        {
+          value1 = pop(S);
+          value2 = pop(S);
+          push(S, value1 + value2);
+        
+        }
+      
+      } else if (string_equal(tok, "-"))    {
+        int x;
+        int y;
+        if (check_func(S))
+          {
+            y = pop(S);
+            x = pop(S);
+            push(S, x - y);
+          
+          }
+
+       } else if (string_equal(tok, "*"))    {
+          int x;
+          int y;
+          
+
+          if (check_func(S))
+            {
+              y = pop(S);
+              x = pop(S);
+              push(S, x * y);
+            
+            }
+
+      } else if (string_equal(tok, "**"))    {
+          int x;
+          int y;
+          
+
+          if (check_func(S))
+            {
+              y = pop(S);
+              x = pop(S);
+              if (y < 0)
+              {
+                error("negative exponents are unedfined");
+              }
+              
+              
+              int result = exponent(x, y);
+              push(S, result);
+      
+            
+            }
+        } else if (string_equal(tok, "/"))    {
+            int x;
+            int y;
+            
+
+            if (check_func(S))
+              {
+                y = pop(S);
+                x = pop(S);
+                if (y == 0)
+                {
+                  error("division by 0 is unedfined");
+                } else if (x == -2147483648 && y == -1)
+                {
+                  error("overflow error");
+                }
+                
+
+                push(S, x / y);
+              
+              }
+
+      } else if (string_equal(tok, "%"))    {
+        int x;
+        int y;
+        
+
+        if (check_func(S))
+          {
+            y = pop(S);
+            x = pop(S);
+            if (y == 0)
+            {
+              error("modulus by 0 is unedfined");
+            } else if (x == -2147483648 && y == -1)
+            {
+              error("overflow error");
+            }
+
+            push(S, x / y);
+        
+        } 
+      } else if (string_equal(tok, "<"))    {
+          int x;
+          int y;
+          if (check_func(S))
+            {
+              y = pop(S);
+              x = pop(S);
+              if (x < y)
+              {
+                push(S, 1);
+              } else
+              {
+                push(S, 0);
+              }
+            
+            }
+
+       } else if (string_equal(tok, "drop"))
+       {
+        if (!stack_empty(S))
+        {
+          pop(S);
+        } else{
+          error("stack is empty!");
+        }
+        
+       } else if (string_equal(tok, "swap"))
+       {
+        int x = 0; 
+        int y = 0;
+
+        if (stack_empty(S))
+        {
+          error("stack is empty");
+        } else
+        {
+           x = pop(S);
+        }
+        if (stack_empty(S))
+        {
+          error("stack is empty");
+        } else
+        {
+           y = pop(S);
+        }
+
+        push(S, x);
+        push(S, y);
+
+       } else if (string_equal(tok, "rot"))
+       {
+        int x = 0; 
+        int y = 0;
+        int z = 0;
+
+        if (stack_empty(S))
+        {
+          error("stack is empty");
+        } else
+        {
+           x = pop(S);
+        }
+        if (stack_empty(S))
+        {
+          error("stack is empty");
+        } else
+        {
+           y = pop(S);
+        }
+        if (stack_empty(S))
+        {
+          error("stack is empty");
+        } else
+        {
+           z = pop(S);
+        }
+
+
+        push(S, y);
+        push(S, x);
+        push(S, z);
+
+       } else if (string_equal(tok, "if"))
+       {
+        if (stack_empty(S))
+        {
+          error("stack is empty");
+        } else
+        {
+          int x = pop(S);
+          if (x == 0) {
+                /* skip the next 3 tokens */
+                for (int i = 0; i < 3; i++) {
+                    if (queue_empty(Q)) {
+                        return true;
+                    } else {
+                        deq(Q);
+                    }
+                }
+            }
+        }
+        
+        
+       } else if (string_equal(tok, "skip"))
+       {
+        if (stack_empty(S))
+        {
+          error("stack is empty");
+        } else
+        {
+          int x = pop(S);
+          if (x < 0)
+          {
+            error("cant skip negative number of elements");
+          } else
+          {
+            /* skip the next x tokens*/
+            for (int  i = 0; i < x; i++)
+            {
+              if (queue_empty(Q))
+              {
+                return true;
+              } else{
+                deq(Q);
+                
+              }
+              
+            }
+          }
+        }
+       } else if (string_equal(tok, "pick"))
+       {
+        int n;
+        int temp;
+        stack_t temp_Stack = stack_new();
+        if (stack_empty(S))
+        {
+          error("stack is empty");
+        }
+
+        n = pop(S);
+        
+        if (n <= 0)
+        {
+           error("top of the stack is not strictly positive");
+        } else
+        {
+          /* pick the nth element*/
+            for (int  i = 0; i < n; i++)
+            {
+              if (stack_empty(S))
+              {
+                error("stack is empty");
+              } else{
+                push(temp_Stack, pop(S));
+                
+              }
+              
+            }
+
+            temp = pop(temp_Stack);
+            push(S, temp);
+            while (!stack_empty(temp_Stack))
+            {
+              push(S, pop(temp_Stack));
+            }
+
+            push(S, temp);
+          
+        }
+       } else if (string_equal(tok, ":"))
+       {
+         if (queue_empty(Q))
+        {
+           error("input Q is empty.");
+          
+        }
+         string name = deq(Q);
+         queue_t def = queue_new();
+         string token = "xxx";
+
+
+           if(queue_empty(Q)) {
+          
+           error("no semicolon was found to properly end the definition");
+        } else {
+              token = deq(Q);
+        }
+
+            while (!string_equal(token, ";"))
+        {
+          if (queue_empty(Q))
+         {
+           
+             error("no semicolon was found to properly end the definition");
+         } else {
+             enq(def, token);
+             token = deq(Q);
+         }
+
+        }
+
+          dict_insert(ST->dictionary, name, def);
+         
+        
+       } else if (dict_lookup(ST->dictionary, tok) != NULL)
+       {
+
+          queue_t holder = queue_new();
+          holder = queue_read_only_copy(dict_lookup(ST->dictionary, tok));
+          if (!queue_empty(Q))
+         {
+            qpush(ST->return_stack, Q);
+         }
+
+          Q = holder;
+       } else {
+    
+      /* Not defined as an operation name, should be an int */
+      int* p = parse_int(tok, 10);
+      if (p == NULL) { /* not an int */
+        /* call error(msg) which prints msg and aborts */
+        error(string_join("undefined token ", tok));
+      }
+      push(S, *p);
+    }
+
+    if (queue_empty(Q) && !qstack_empty(ST->return_stack))
+    {
+      Q = qpop(ST->return_stack);
+    }
+  }
+
+  /* When you return "true", don't pop anything off the stack! When we
+   * grade your function, we'll check that the stack contains the
+   * integers we expect. */
+  return true;
+}

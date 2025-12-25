@@ -1,0 +1,96 @@
+/**************************************************************************/
+/*              COPYRIGHT Carnegie Mellon University 2023                 */
+/* Do not post this file or any derivative on a public site or repository */
+/**************************************************************************/
+#use <conio>
+
+int main() {
+  // Create a few arrays of integers
+
+  // Using them, test the functions test get_bit and set_bit
+    printf("Running tests...\n");
+
+    // // TEST 1: Create an array of 2 integers (Total 64 bits available)
+    // // We initialize them to 0 (all bits off).
+    // int[] A = alloc_array(int, 2);
+    // A[0] = 0;
+    // A[1] = 0;
+    // // TEST 2: Set the very first bit (Bit 0)
+    // set_bit(A, 0);
+    // // CHECK: Did Bit 0 turn ON?
+    // assert(get_bit(A, 0)); 
+    // // CHECK: Did Bit 1 stay OFF? (Make sure we didn't break neighbors)
+    // assert(get_bit(A, 1) == false);
+    
+    // printf("[PASS] Bit 0 set correctly.\n");
+
+    // // TEST 3: Set a bit in the NEXT integer (Bit 33)
+    // // Bit 33 is in A[1], at index 1.
+    // set_bit(A, 33);
+    // // CHECK: Did Bit 33 turn ON?
+    // assert(get_bit(A, 33) == true);
+    // // CHECK: Did Bit 32 stay OFF?
+    // assert(!get_bit(A, 32));
+
+    // printf("[PASS] Bit 33 (Boundary Crossing) set correctly.\n");
+
+    // --- TORTURE TEST SUITE ---
+    printf("\nStarting Torture Test...\n");
+
+    // We need 3 integers to test boundaries (bits 0-95)
+    // Initialize to ALL ZEROS.
+    int[] B = alloc_array(int, 3); 
+    B[0] = 0;
+    B[1] = 0;
+    B[2] = 0;
+
+    // TRICK 1: The "Neighbor" Test (Checks for Overwriting)
+    printf("Test 1: Neighbors... ");
+    set_bit(B, 5);
+    set_bit(B, 6); // If you used '=', this will erase bit 5!
+    assert(get_bit(B, 5));
+    assert(get_bit(B, 6));
+    printf("PASSED.\n");
+
+    // TRICK 2: The "Sign Bit" Test (Bit 31)
+    // Bit 31 is the most dangerous bit because it turns the integer negative.
+    printf("Test 2: Sign Bit (31)... ");
+    set_bit(B, 31);
+    assert(get_bit(B, 31));
+    
+    // Ensure we didn't accidentally touch the NEXT integer (Bit 32)
+    assert(!get_bit(B, 32)); 
+    // Ensure we didn't touch the PREVIOUS bit (Bit 30)
+    assert(!get_bit(B, 30));
+    printf("PASSED.\n");
+
+    // TRICK 3: The "Double Tap" (Idempotency)
+    // Setting a bit that is ALREADY 1 should change nothing.
+    printf("Test 3: Re-setting a bit... ");
+    set_bit(B, 31); // It's already 1.
+    set_bit(B, 31); // Do it again.
+    assert(get_bit(B, 31));
+    // If your logic toggles (XOR) instead of sets (OR), this will fail (it would become 0).
+    printf("PASSED.\n");
+
+    // TRICK 4: The "Full House" Loop
+    // Fill an entire integer bit-by-bit to ensure index math works perfectly.
+    printf("Test 4: Filling an entire integer... ");
+    int[] C = alloc_array(int, 1);
+    C[0] = 0;
+    for (int k = 0; k < 32; k++) {
+        set_bit(C, k);
+        assert(get_bit(C, k));
+    }
+    // If this passes, your (x % 32) logic is perfect.
+    printf("PASSED.\n");
+
+    printf("\n*** MASTER STATUS ACHIEVED: CODE IS ROBUST ***\n");
+
+
+
+
+
+    printf("All tests passed!\n");
+    return 0;
+}

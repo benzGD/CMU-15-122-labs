@@ -1,0 +1,101 @@
+bool even(void* x)
+/*@requires \hastag(int*, x); @*/
+{
+    int* p = (int*)x;
+
+    if((p == NULL) || *p < 0 || (*p%2 != 0)){
+        return false;
+    } else {
+        return true;
+    }
+}
+
+
+bool odd(void* x)
+/*@requires \hastag(int*, x); @*/
+{
+    int* p = (int*)x;
+
+    if((p == NULL) || *p < 0 || (*p%2 == 0)){
+        return false;
+    } else {
+        return true;
+    }
+}
+
+
+bool incr(void* x)
+/*@requires \hastag(int*, x); @*/
+{
+    int* p = (int*)x;
+
+    if(p == NULL){
+        return true;
+    } else {
+        *p = *p + 1;
+        return true;
+    }
+}
+
+void* find_negative(void* x , void* y)
+/*@requires \hastag(int*, x); @*/
+/*@requires \hastag(int*, y); @*/
+/*@ensures \hastag(int*, \result); @*/
+{
+    if(x == NULL) {
+    
+        int* p = (int*)y;
+
+        if(*p < 0){
+            x = (void*)p;
+        }
+        return x;
+
+    }
+    return x;
+
+}
+
+//new_q is the pointer to the new_queue and data is the pointer to
+//to the int* data
+void* copy(void* new_q, void* data)
+/*@requires \hastag(int*, data); @*/
+/*@ensures \hastag(queue_t, \result); @*/
+{
+
+    queue_t Q = (queue_t)new_q;
+    // int* p = (int*)data;  //d cast back to int*
+    enq(Q, data);
+    return (void*)Q;
+
+}
+
+
+void* insert(void* x , void* y)
+/*@requires x!= NULL && \hastag(int*, x); @*/
+/*@requires y!= NULL && \hastag(int*, y); @*/
+/*@ensures \result!= NULL && \hastag(int*, \result); @*/
+{
+    int* p = (int*)x;
+    int* q = (int*)y;
+
+
+    if(*q > *p){
+        int temp = *p;
+        *p = *q;
+        *q = temp;
+    }
+
+    return (void*)p;
+}
+
+
+void free_ints(void* x)
+/*@requires x!= NULL && \hastag(int*, x); @*/
+{
+
+    int* p = (int*)x;
+    free(p);
+
+}
+

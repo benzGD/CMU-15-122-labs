@@ -1,0 +1,71 @@
+/**************************************************************************/
+/*              COPYRIGHT Carnegie Mellon University 2023                 */
+/* Do not post this file or any derivative on a public site or repository */
+/**************************************************************************/
+#use <conio>
+
+// You are welcome to define helper functions for your tests
+
+int main() {
+  // Create a few queues
+
+  // Using them, test the functions you wrote in file queue.c1[
+  queue_t Q1 = queue_new();
+  int* x = alloc(int);
+  *x = 10;
+  int* y = alloc(int);
+  *y = 23;
+  int* z = alloc(int);
+  *z = -19;
+  int* a = alloc(int);
+  *a = 0;
+  int* b = alloc(int);
+  *b = -1;
+  int* c = alloc(int);
+  *c = 69;
+
+  
+
+  enq(Q1, (void*)x);
+  enq(Q1, (void*)y);
+  enq(Q1, (void*)z);
+  enq(Q1, (void*)a);
+  enq(Q1, (void*)b);
+  enq(Q1, (void*)c);
+
+  assert(queue_size(Q1) == 6);
+  // assert(*(int*)queue_peek(Q1, 1) == 23);
+  assert(*(int*)queue_iterate(Q1, NULL, &find_negative) == -19);
+  
+  // for(int i = 0; i < queue_size(Q1); i++){
+    //   printf("%d ", *(int*)queue_peek(Q1, i));
+    // }
+
+  // --- Test 1: deq entire queue ---
+while (queue_size(Q1) > 0) {
+    deq(Q1);
+}
+assert(queue_size(Q1) == 0);
+
+// Refill
+enq(Q1, (void*)x);
+enq(Q1, (void*)y);
+assert(queue_size(Q1) == 2);
+assert(*(int*)queue_peek(Q1, 0) == 10);
+assert(*(int*)queue_peek(Q1, 1) == 23);
+
+    
+  
+    printf("\n");
+    // queue_reverse(Q1);
+    
+    // for(int i = 0; i < queue_size(Q1); i++){
+      //   printf("%d ", *(int*)queue_peek(Q1, i));
+      // }
+      
+    // assert(*(int*)queue_iterate(Q1, NULL, &find_negative) == -1);
+
+
+  printf("All tests passed!\n");
+  return 0;
+}

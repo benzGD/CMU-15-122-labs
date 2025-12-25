@@ -1,0 +1,150 @@
+/**************************************************************************/
+/*              COPYRIGHT Carnegie Mellon University 2023                 */
+/* Do not post this file or any derivative on a public site or repository */
+/**************************************************************************/
+#use <rand>
+#use <util>
+#use <string>
+#use <conio>
+
+// You are welcome to define helper functions for your tests
+
+int main() {
+  // Create a few bloom filters to test CORRECTNESS: here, focus on raising
+  //      assertion errors on any incorrect implementation of the interface
+
+  bloom_t H = bloom_new(20);
+  printf("b limit :%d\n", H->limit);
+  bloom_add(H, "apple");
+  bloom_add(H, "banana");
+  bloom_add(H, "cherry");
+  bloom_add(H, "date");
+  bloom_add(H, "elderberry");
+  bloom_add(H, "fig");
+  bloom_add(H, "grape");
+  bloom_add(H, "honeydew");
+  bloom_add(H, "kiwi");
+  bloom_add(H, "lemon");
+  bloom_add(H, "quasar77");
+  bloom_add(H, "minty_z9");
+  bloom_add(H, "orbitalX");
+  bloom_add(H, "skyblade3");
+  bloom_add(H, "terraFlux");
+  bloom_add(H, "gamma_42");
+  bloom_add(H, "pixelDust");
+  bloom_add(H, "novaSpin");
+  bloom_add(H, "ultraKite");
+  bloom_add(H, "frostling");
+
+
+
+  if (!bloom_contains(H, "apple")) {
+    assert(false);
+}
+
+  if (!bloom_contains(H, "banana")) {
+      assert(false);
+  }
+
+  if (!bloom_contains(H, "cherry")) {
+      assert(false);
+  }
+
+  if (!bloom_contains(H, "date")) {
+      assert(false);
+  }
+
+  if (!bloom_contains(H, "elderberry")) {
+      assert(false);
+  }
+
+  if (!bloom_contains(H, "fig")) {
+      assert(false);
+  }
+
+  if (!bloom_contains(H, "grape")) {
+      assert(false);
+  }
+
+  if (!bloom_contains(H, "honeydew")) {
+      assert(false);
+  }
+
+  if (!bloom_contains(H, "kiwi")) {
+      assert(false);
+  }
+
+  if (!bloom_contains(H, "lemon")) {
+      assert(false);
+  }
+
+  if (!bloom_contains(H, "quasar77")) {
+    assert(false);
+}
+
+  if (!bloom_contains(H, "minty_z9")) {
+      assert(false);
+  }
+
+  if (!bloom_contains(H, "orbitalX")) {
+      assert(false);
+  }
+
+  if (!bloom_contains(H, "skyblade3")) {
+      assert(false);
+  }
+
+  if (!bloom_contains(H, "terraFlux")) {
+      assert(false);
+  }
+
+  if (!bloom_contains(H, "gamma_42")) {
+      assert(false);
+  }
+
+  if (!bloom_contains(H, "pixelDust")) {
+      assert(false);
+  }
+
+  if (!bloom_contains(H, "novaSpin")) {
+      assert(false);
+  }
+
+  if (!bloom_contains(H, "ultraKite")) {
+      assert(false);
+  }
+
+  if (!bloom_contains(H, "frostling")) {
+      assert(false);
+  }
+
+
+  int count = 0;
+  if (bloom_contains(H, "r3xQp1")) { count++; }
+  if (bloom_contains(H, "blip99")) { count++; }
+  if (bloom_contains(H, "zeta_alpha")) { count++; }
+  if (bloom_contains(H, "moonbyte")) { count++; }
+  if (bloom_contains(H, "crunch42")) { count++; }
+  if (bloom_contains(H, "vortex7")) { count++; }
+  if (bloom_contains(H, "sunbeamX")) { count++; }
+  if (bloom_contains(H, "kappa_22")) { count++; }
+  if (bloom_contains(H, "neoSpark")) { count++; }
+  if (bloom_contains(H, "jungle123")) { count++; }
+
+
+  printf("number of false positives : %d\n", count);
+
+
+  print_bloom(H);
+  printf("All correctness tests passed!\n\n");
+
+  // Create a few boom filters to test PERFORMANCE: this part should
+  //     compute and return a performance score between 0 and 100 that
+  //     assesses how bad or good a bloom filter implementation is
+
+
+
+
+  printf("Returning the performance score.\n");
+  return 0;  // MODIFY ME
+}

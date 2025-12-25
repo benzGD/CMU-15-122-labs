@@ -1,0 +1,72 @@
+#use <string>
+#use <util>
+
+
+int hash_string(string s) {
+    int len = string_length(s);
+    char[] ch = string_to_chararray(s);
+    int c = char_ord(ch[0]);
+    int hash_value = 0;
+    int m;
+    for(int i = 1; i < len; i++)
+    {
+        m = char_ord(ch[i]);
+        hash_value = c * 31 + m;
+        c = hash_value;
+    }
+    return hash_value;
+}
+
+struct bloom_filter {
+    int capacity;
+    bool[] data;
+};
+
+typedef struct bloom_filter bloom_f;
+
+typedef bloom_f* bloom_t;
+
+
+bool is_bloom_expected_length(int length, bool[] data) {
+     //@assert \length(data) == length;
+     return true;
+}
+
+
+
+bool is_bloom(bloom_t B) {
+    return B!= NULL && is_bloom_expected_length(B->capacity, B->data);
+}
+
+
+bloom_t bloom_new(int capacity)
+/*@requires 0 < capacity && capacity <  int_max()/4; @*/
+/*@ensures \result != NULL; @*/ 
+{
+    bloom_t B = alloc(bloom_f);
+    B->capacity = capacity;
+    B->data = alloc_array(bool, capacity);
+    return B;
+
+}
+
+
+
+
+bool bloom_contains(bloom_t B, string x)
+/*@requires is_bloom(B);  @*/
+{
+    int index = abs(hash_string(x)) % B->capacity;
+    return B->data[index];
+}
+
+
+
+void bloom_add(bloom_t B, string x) 
+/*@requires is_bloom(B);  @*/
+/*@ensures bloom_contains(B, x); @*/
+{
+    int index = abs(hash_string(x)) % B->capacity;
+    B->data[index] = true;
+
+}

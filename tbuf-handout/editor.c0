@@ -1,0 +1,224 @@
+/**************************************************************************/
+/*              COPYRIGHT Carnegie Mellon University 2023                 */
+/* Do not post this file or any derivative on a public site or repository */
+/**************************************************************************/
+/*
+ * Augment doubly linked lists with row and column information.
+ *
+ * 15-122 Principles of Imperative Computation */
+
+/*** Interface ***/
+
+typedef struct editor_header editor;
+struct editor_header {
+  tbuf* buffer;
+  int row;
+  int col;
+};
+
+bool is_editor(editor* E)
+{
+  if (E != NULL && 
+    is_tbuf(E->buffer) && 
+    E->row == tbuf_row(E->buffer) && 
+    E->col == tbuf_col(E->buffer))
+  {
+    return true;
+  }
+  
+  return false;
+
+}
+
+editor* editor_new()
+{
+  editor* E = alloc(editor);
+  E->buffer = tbuf_new();
+  E->row = 1;
+  E->col = 0;
+  return E;
+}
+void editor_forward(editor* E)
+{
+  if (!tbuf_at_right(E->buffer))
+  {
+    if (E->buffer->cursor->data == '\n')
+    {
+      E->col = 0;
+      E->row++;
+    } else
+    {
+      E->col++;
+    }
+
+    tbuf_forward(E->buffer);
+    
+  }
+  
+}
+void editor_backward(editor* E)
+{
+  if (!tbuf_at_left(E->buffer))
+  {
+    tbuf_backward(E->buffer);
+    if (E->buffer->cursor->data == '\n')
+    {
+      E->col = tbuf_col(E->buffer);
+      E->row--;
+    } else
+    {
+      E->col--;
+    }
+  }
+}
+void editor_insert(editor* E, char c)
+{
+  tbuf_insert(E->buffer, c);
+  if (c == '\n')
+  {
+    E->row++;
+    E->col = 0;
+  } else
+  {
+    E->col++;
+  }
+  
+  
+}
+void editor_delete(editor* E)
+{
+  if (!is_empty(E->buffer) && !tbuf_at_left(E->buffer))
+  {
+    if (E->buffer->cursor->prev->data=='\n')
+    {
+      tbuf_delete(E->buffer);
+      E->row--;
+      E->col = tbuf_col(E->buffer);
+    } else
+    {
+      tbuf_delete(E->buffer);
+      E->col--;
+    }
+    
+    
+  }
+  
+}
+void editor_up(editor* E);             /* Moves the cursor up              */
+void editor_down(editor* E);           /* Moves the cursor down            */
+
+/*** Implementation ***/
+
+
+
+
+// Bonus: Implement these function is you do the bonus task
+void editor_up(editor* E) 
+{
+  if (E->row > 1)
+  {
+    dll* l = E->buffer->cursor;
+    int len = 0;
+    while (l->data != '\n')
+    {
+      l = l->prev;
+    }
+
+    dll* m = l;   /*making copy of that position*/
+    /*l is at the '\n' */
+    while(l->prev != E->buffer->start && l->prev->data != '\n')
+    {
+      l = l-> prev;
+      len++;
+
+    }
+
+    if (len < E->col)
+    {
+      E->buffer->cursor = m;
+      E->row--;
+      E->col = tbuf_col(E->buffer);
+    } else if (len == E->col)
+    {
+      E->buffer->cursor = m;
+
+      E->row--;
+    } else
+    {
+      for (int i = 0; i < E->col; i++)
+      {
+        l = l->next;
+      }
+      E->buffer->cursor = l;
+      E->row--;
+
+      
+    }
+
+  }
+  
+ }
+
+ int r_counter(editor* E)
+ {
+  dll* l = E->buffer->cursor;
+  int count = E->row;
+
+  while (l != E->buffer->end)
+  {
+    if (l->data == '\n')
+    {
+      count++;
+    }
+    l = l->next;
+    
+  }
+
+  return count;
+ }
+
+
+void editor_down(editor* E) 
+{
+
+  int total_row_count = r_counter(E);
+  if (E->row < total_row_count)
+  {
+    dll* l = E->buffer->cursor;
+    int len = 0;
+    while (l->data != '\n')
+    {
+      l = l->next;
+    }
+    /*l is at the '\n' */
+    l = l->next;
+    dll* m = l;
+
+    while (l->data != '\n' && l != E->buffer->end)
+    {
+      len++;
+      l = l->next;
+    }
+    
+    if (len > E->col)
+    {
+      for (int i = 0; i < E->col; i++)
+      {
+        m = m->next;
+      }
+
+      E->buffer->cursor = m;
+      E->row++;
+      
+    }
+    else
+    {
+      E->buffer->cursor = l;
+      E->row++;
+      E->col = tbuf_col(E->buffer);
+
+    }
+
+  }
+  
+ }
